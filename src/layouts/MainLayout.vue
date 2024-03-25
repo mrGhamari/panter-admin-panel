@@ -1,18 +1,33 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+  <q-layout view="hHh lpR fFf">
+    <q-header>
       <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+        <q-btn
+          flat
+          dense
+          round
+          icon="menu"
+          aria-label="Menu"
+          @click="toggleLeftDrawer"
+        />
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item-label header>
-          Essential Links
-        </q-item-label>
-
-        <EssentialLink v-for="link in essentialLinks" :key="link.title" v-bind="link" />
+    <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered>
+      <q-list class="q-mt-md">
+        <q-item
+          v-for="(item, index) in sideBarItem"
+          :key="index"
+          clickable
+          class="row items-center q-mx-sm rounded-borders"
+          :class="
+            currentPage == item.name ? 'bg-primary text-white' : 'bg-white'
+          "
+          @click="goToPage(item.route)"
+        >
+          <q-icon :name="item.icon" size="30px" />
+          <div class="text-h6 text-bold q-ml-md">{{ item.name }}</div>
+        </q-item>
       </q-list>
     </q-drawer>
 
@@ -23,57 +38,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import EssentialLink, { EssentialLinkProps } from 'components/EssentialLink.vue';
+import { ref, computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
-const essentialLinks: EssentialLinkProps[] = [
+// ------ Variabels ------
+const route = useRoute();
+const router = useRouter();
+const sideBarItem = [
   {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
+    name: 'Dashboard',
+    icon: 'dashboard',
+    route: 'Dashboard',
   },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
 ];
 
-const leftDrawerOpen = ref(false)
+// ------ Variabels ------
+const leftDrawerOpen = ref<boolean>(false);
 
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value
-}
+// ------ Computed ------
+const currentPage = computed(
+  () => sideBarItem.find((item) => item.name === route.name)?.name,
+);
+
+// ------ Methods ------
+const goToPage = (route: string) => router.push({ name: route });
+const toggleLeftDrawer = () => (leftDrawerOpen.value = !leftDrawerOpen.value);
 </script>
